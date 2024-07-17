@@ -561,6 +561,8 @@ public class AlignmentPacker {
                 return movieName + "/" + zmw;
             case MAPPING_QUALITY:
                 return al.getMappingQuality();
+            case SELECTED:
+                return renderOptions.getSelectedReadNames().containsKey(al.getReadName()) ? "SELECTED" : "";
         }
         return null;
     }

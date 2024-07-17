@@ -169,7 +169,8 @@ public class AlignmentTrack extends AbstractTrack implements IGVEventObserver {
         LINKED("linked"),
         PHASE("phase"),
         REFERENCE_CONCORDANCE("reference concordance"),
-        MAPPING_QUALITY("mapping quality");
+        MAPPING_QUALITY("mapping quality"),
+        SELECTED("selected");
 
         public final String label;
         public final boolean reverse;
@@ -1278,6 +1279,10 @@ public class AlignmentTrack extends AbstractTrack implements IGVEventObserver {
 
         public int getBaseQualityMax() {
             return baseQualityMax;
+        }
+
+        public HashMap<String, Color> getSelectedReadNames() {
+            return this.track.getSelectedReadNames();
         }
 
         void setShowAllBases(boolean showAllBases) {
