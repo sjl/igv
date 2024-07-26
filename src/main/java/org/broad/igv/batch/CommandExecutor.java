@@ -178,6 +178,9 @@ public class CommandExecutor {
                     return e.getMessage();
                 }
                 setSequenceShowTranslation(showTranslation);
+            } else if (cmd.equalsIgnoreCase("alignmentTrackNames")) {
+                String separator = param1;
+                result = getAlignmentTrackNames(separator);
             } else if (cmd.equalsIgnoreCase("expand")) {
                 String trackName = parseTrackName(param1);
                 setTrackDisplayMode(Track.DisplayMode.EXPANDED, trackName);
@@ -500,6 +503,10 @@ public class CommandExecutor {
         return "OK";
     }
 
+
+    private String getAlignmentTrackNames(String separator) {
+        return igv.getAlignmentTracks().stream().map(t -> t.getName()).collect(Collectors.joining(separator));
+    }
 
     private void setTrackDisplayMode(Track.DisplayMode mode, String trackName) {
         for (Track t : tracksMatchingName(trackName)) {
@@ -1263,7 +1270,7 @@ public class CommandExecutor {
             return AlignmentTrack.GroupOption.READ_GROUP;
         } else if (str.equalsIgnoreCase("base")) {
             return AlignmentTrack.GroupOption.BASE_AT_POS;
-        }else if (str.equalsIgnoreCase("insertion")) {
+        } else if (str.equalsIgnoreCase("insertion")) {
             return AlignmentTrack.GroupOption.INSERTION_AT_POS;
         } else if (str.equalsIgnoreCase("selected")) {
             return AlignmentTrack.GroupOption.SELECTED;
