@@ -108,6 +108,9 @@ public class AlignmentRenderer {
     private static Color skippedColor = new Color(150, 184, 200);
     private static Color unknownGapColor = new Color(0, 150, 0);
 
+    // Supplementary
+    private static final Color supplementaryColor = new Color(188, 118, 255);
+
     // Bisulfite colors
     private static final Color bisulfiteColorFw1 = new Color(195, 195, 195);
     private static final Color bisulfiteColorRev1 = new Color(195, 210, 195);
@@ -1125,6 +1128,12 @@ public class AlignmentRenderer {
                 break;
             case NOMESEQ:
                 c = nomeseqColor;
+                break;
+
+            case SUPPLEMENTARY:
+                if (alignment.isSupplementary()) {
+                    c = supplementaryColor;
+                }
                 break;
 
             case UNEXPECTED_PAIR:
