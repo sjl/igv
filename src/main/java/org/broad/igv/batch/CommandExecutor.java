@@ -66,6 +66,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 public class CommandExecutor {
 
@@ -181,6 +182,14 @@ public class CommandExecutor {
             } else if (cmd.equalsIgnoreCase("alignmentTrackNames")) {
                 String separator = param1;
                 result = getAlignmentTrackNames(separator);
+            } else if (cmd.equalsIgnoreCase("selectByName")) {
+                String trackName = parseTrackName(param1);
+                String readName = param2;
+                String sep = param3;
+                selectReadsInTrack(trackName, readName, sep);
+            } else if (cmd.equalsIgnoreCase("clearSelections")) {
+                String trackName = parseTrackName(param1);
+                clearSelectionsInTrack(trackName);
             } else if (cmd.equalsIgnoreCase("expand")) {
                 String trackName = parseTrackName(param1);
                 setTrackDisplayMode(Track.DisplayMode.EXPANDED, trackName);
@@ -503,6 +512,39 @@ public class CommandExecutor {
         return "OK";
     }
 
+    private void selectReadsInTrack(String trackName, String readName, String sep) {
+        String[] readNames;
+        if (sep != null && sep.trim().length() > 0) {
+            readNames = readName.split(Pattern.quote(sep));
+        } else {
+            readNames = new String[]{readName};
+        }
+
+        if (readNames.length > 0) {
+            for (Track t : tracksMatchingName(trackName)) {
+                if (t instanceof AlignmentTrack) {
+                    AlignmentTrack alignmentTrack = (AlignmentTrack) t;
+
+                    Arrays.stream(readNames)
+                        .forEach(r -> {
+                            alignmentTrack.getSelectedReadNames().put(r, alignmentTrack.getReadNamePalette().get(r));
+                        });
+
+                    alignmentTrack.repaint();
+                }
+            }
+        }
+    }
+
+    private void clearSelectionsInTrack(String trackName) {
+        for (Track t : tracksMatchingName(trackName)) {
+            if (t instanceof AlignmentTrack) {
+                AlignmentTrack alignmentTrack = (AlignmentTrack) t;
+                alignmentTrack.getSelectedReadNames().clear();
+                alignmentTrack.repaint();
+            }
+        }
+    }
 
     private String getAlignmentTrackNames(String separator) {
         return igv.getAlignmentTracks().stream().map(t -> t.getName()).collect(Collectors.joining(separator));
