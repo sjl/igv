@@ -156,6 +156,7 @@ class AlignmentTrackMenu extends IGVPopupMenu {
 
         // Copy items
         addSeparator();
+        addCopyNameToClipboardItem(e, clickedAlignment);
         addCopyToClipboardItem(e, clickedAlignment);
         addCopySequenceItems(e);
         addConsensusSequence(e);
@@ -789,6 +790,25 @@ class AlignmentTrackMenu extends IGVPopupMenu {
         add(item);
     }
 
+    void addCopyNameToClipboardItem(final TrackClickEvent te, Alignment alignment) {
+
+        final MouseEvent me = te.getMouseEvent();
+        JMenuItem item = new JMenuItem("Copy read name");
+        final ReferenceFrame frame = te.getFrame();
+        if (frame == null) {
+            item.setEnabled(false);
+        } else {
+            final double location = frame.getChromosomePosition(me);
+
+            // Change track height by attribute
+            item.addActionListener(aEvt -> copyNameToClipboard(te, alignment));
+            if (alignment == null) {
+                item.setEnabled(false);
+            }
+        }
+        add(item);
+    }
+
 
     void addViewAsPairsMenuItem() {
         final JMenuItem item = new JCheckBoxMenuItem("View as pairs");
@@ -1179,6 +1199,17 @@ class AlignmentTrackMenu extends IGVPopupMenu {
         addShowChimericRegions(alignmentTrack, tce, clickedAlignment);
         addShowDiagram(tce, clickedAlignment);
 
+    }
+
+    /**
+     * Copy the read name to the system clipboard.
+     */
+    private void copyNameToClipboard(final TrackClickEvent e, Alignment alignment) {
+        if (alignment != null) {
+            StringSelection stringSelection = new StringSelection(alignment.getReadName());
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, null);
+        }
     }
 
     /**
