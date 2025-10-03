@@ -1,6 +1,7 @@
 package org.igv.alignment;
 
 import htsjdk.samtools.SAMTag;
+import htsjdk.samtools.util.SequenceUtil;
 import org.igv.Globals;
 import org.igv.event.AlignmentTrackEvent;
 import org.igv.event.IGVEventBus;
@@ -38,6 +39,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.lang.StringBuilder;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -1176,6 +1178,17 @@ class AlignmentTrackMenuHelper {
             return;
         }
         item.addActionListener(aEvt -> StringUtils.copyTextToClipboard(seq));
+
+        /* Add a "Copy as FASTQ" item to copy this single read in FASTQ format */
+        final JMenuItem item2 = new JMenuItem("Copy read as FASTQ");
+        add(item2);
+        item2.addActionListener(aEvt -> {
+            final String qual = alignment.getReadQuality();
+            final String origSequence  = alignment.isNegativeStrand() ? SequenceUtil.reverseComplement(seq) : seq;
+            final String qualityScores = alignment.isNegativeStrand() ? new StringBuilder(qual).reverse().toString() : qual;
+
+            StringUtils.copyTextToClipboard(String.format("@%s\n%s\n+\n%s", alignment.getReadName(), origSequence, qualityScores));
+        });
 
         /* Add a "Copy left clipped sequence" item if there is  left clipping. */
         int minimumBlatLength = BlatClient.MINIMUM_BLAT_LENGTH;

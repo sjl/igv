@@ -282,6 +282,10 @@ public class SAMAlignment implements Alignment {
         return record.getReadString();
     }
 
+    public String getReadQuality() {
+        return record.getBaseQualityString();
+    }
+
     public int getAlignmentStart() {
         return record.getAlignmentStart() - 1;
     }

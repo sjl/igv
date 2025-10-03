@@ -29,6 +29,10 @@ public interface Alignment extends LocusScore {
         return "";
     }
 
+    default String getReadQuality() {
+        return "";
+    }
+
     default String getChr(){ return getContig();}
 
     int getAlignmentStart();
