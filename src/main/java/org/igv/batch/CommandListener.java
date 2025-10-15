@@ -399,13 +399,14 @@ public class CommandListener implements Runnable {
 
                 String name = params.get("name");
                 String format = params.get("format");
+                String panel = params.get("panel");
                 String locus = params.get("locus");
                 String index = params.get("index");
                 String coverage = params.get("coverage");
                 String sort = params.get("sort");
                 String sortTag = params.get("sortTag");
                 boolean dup = "true".equals(params.get("dup"));
-                result = cmdExe.loadFiles(file, index, coverage, name, format, locus, merge, params, sort, sortTag, dup);
+                result = cmdExe.loadFiles(file, index, coverage, name, format, panel, locus, merge, params, sort, sortTag, dup);
             } else {
                 result = "OK";  // No files, perhaps genome only
             }

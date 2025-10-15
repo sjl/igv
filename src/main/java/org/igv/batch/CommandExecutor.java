@@ -171,6 +171,12 @@ public class CommandExecutor {
         } else if (cmd.equalsIgnoreCase("remove")) {
             String trackName = parseTrackName(param1);
             result = removeTrack(trackName);
+        } else if (cmd.equalsIgnoreCase("addPanel")) {
+            String newPanelName = param1 != null? param1 : "Panel" + System.currentTimeMillis();
+            igv.addDataPanel(newPanelName);
+        } else if (cmd.equalsIgnoreCase("panelNames")) {
+            String separator = param1 != null ? param1 : ",";
+            result = igv.getTrackPanels().stream().map(t -> t.getName()).collect(Collectors.joining(separator));
         } else if (cmd.equalsIgnoreCase("tweakdivider")) {
             //igv.tweakPanelDivider();
         } else if (cmd.equalsIgnoreCase("setDataRange")) {
@@ -730,8 +736,9 @@ public class CommandExecutor {
      */
     private String load(String fileString, List<String> params) throws IOException {
 
-        // remaining parameters might be "merge", "name", or "index"
+        // remaining parameters might be "panel", "merge", "name", or "index"
         String name = null;
+        String panel = null;
         String index = null;
         String coverage = null;
         String format = null;
@@ -749,6 +756,8 @@ public class CommandExecutor {
                     coverage = param.substring(9);
                 } else if (param != null && param.startsWith("format=")) {
                     format = param.substring(7);
+                } else if (param != null && param.startsWith("panel=")) {
+                    panel = param.substring(6);
                 }
             }
         }
@@ -759,7 +768,7 @@ public class CommandExecutor {
         Map<String, String> ignore = null;
         String sort = null;
         String sortTag = null;
-        return loadFiles(fileString, index, coverage, name, format, locus, merge, ignore, sort, sortTag, true);
+        return loadFiles(fileString, index, coverage, name, format, panel, locus, merge, ignore, sort, sortTag, true);
 
     }
 
@@ -782,6 +791,7 @@ public class CommandExecutor {
                      final String coverageString,
                      final String nameString,
                      final String formatString,
+                     final String panelString,
                      final String locus,
                      final boolean merge,
                      Map<String, String> params,
@@ -801,6 +811,7 @@ public class CommandExecutor {
             List<String> coverageFiles = breakFileString(coverageString);
             List<String> names = breakFileString(nameString);
             List<String> formats = breakFileString(formatString);
+            List<String> panels = breakFileString(panelString);
             if (names != null && names.size() != files.size()) {
                 return "Error: If file is a comma-separated list, names must also be a comma-separated list of the same length";
             }
@@ -867,6 +878,9 @@ public class CommandExecutor {
                     }
                     if (formats != null) {
                         rl.setFormat(formats.get(fi));
+                    }
+                    if (panels != null) {
+                        rl.setPanelName(panels.get(fi));
                     }
 
                     if (params != null) {
