@@ -201,10 +201,7 @@ class AlignmentTrackMenuHelper {
 
         // Copy items
         addSeparator();
-        addCopyNameToClipboardItem(e, clickedAlignment);
-        addCopyToClipboardItem(e, clickedAlignment);
-        addCopySequenceItems(e);
-        addConsensusSequence(e);
+        addCopyMenuItem(e, clickedAlignment);
 
         // Blat items
         addSeparator();
@@ -363,8 +360,7 @@ class AlignmentTrackMenuHelper {
      *
      * @param e
      */
-    private void addConsensusSequence(TrackClickEvent e) {
-
+    private void addConsensusSequence(JMenu copyMenu, TrackClickEvent e) {
         JMenuItem item = new JMenuItem("Copy consensus sequence");
 
         final ReferenceFrame frame;
@@ -375,7 +371,7 @@ class AlignmentTrackMenuHelper {
         }
 
         item.setEnabled(frame != null);
-        add(item);
+        copyMenu.add(item);
 
         item.addActionListener(ae -> {
 
@@ -927,8 +923,7 @@ class AlignmentTrackMenuHelper {
         add(item);
     }
 
-    void addCopyToClipboardItem(final TrackClickEvent te, Alignment alignment) {
-
+    void addCopyToClipboardItem(JMenu copyMenu, final TrackClickEvent te, Alignment alignment) {
         final MouseEvent me = te.getMouseEvent();
         JMenuItem item = new JMenuItem("Copy read details");
         final ReferenceFrame frame = te.getFrame();
@@ -943,10 +938,10 @@ class AlignmentTrackMenuHelper {
                 item.setEnabled(false);
             }
         }
-        add(item);
+        copyMenu.add(item);
     }
 
-    void addCopyNameToClipboardItem(final TrackClickEvent te, Alignment alignment) {
+    void addCopyNameToClipboardItem(JMenu copyMenu, final TrackClickEvent te, Alignment alignment) {
 
         final MouseEvent me = te.getMouseEvent();
         JMenuItem item = new JMenuItem("Copy read name");
@@ -962,7 +957,7 @@ class AlignmentTrackMenuHelper {
                 item.setEnabled(false);
             }
         }
-        add(item);
+        copyMenu.add(item);
     }
 
 
@@ -1162,11 +1157,14 @@ class AlignmentTrackMenuHelper {
         return items;
     }
 
+    void addCopyMenuItem(final TrackClickEvent te, Alignment clickedAlignment) {
+        JMenu copyMenu = new JMenu("Copy");
 
-    void addCopySequenceItems(final TrackClickEvent te) {
+        addCopyNameToClipboardItem(copyMenu, te, clickedAlignment);
+        addCopyToClipboardItem(copyMenu, te, clickedAlignment);
 
         final JMenuItem item = new JMenuItem("Copy read sequence");
-        add(item);
+        copyMenu.add(item);
         final Alignment alignment = getSpecificAlignment(te);
         if (alignment == null) {
             item.setEnabled(false);
@@ -1181,7 +1179,7 @@ class AlignmentTrackMenuHelper {
 
         /* Add a "Copy as FASTQ" item to copy this single read in FASTQ format */
         final JMenuItem item2 = new JMenuItem("Copy read as FASTQ");
-        add(item2);
+        copyMenu.add(item2);
         item2.addActionListener(aEvt -> {
             final String qual = alignment.getReadQuality();
             final String origSequence  = alignment.isNegativeStrand() ? SequenceUtil.reverseComplement(seq) : seq;
@@ -1196,7 +1194,7 @@ class AlignmentTrackMenuHelper {
         if (clipping.getLeftSoft() > 0) {
             String lcSeq = getClippedSequence(alignment.getReadSequence(), 0, clipping.getLeftSoft());
             final JMenuItem lccItem = new JMenuItem("Copy left-clipped sequence");
-            add(lccItem);
+            copyMenu.add(lccItem);
             lccItem.addActionListener(aEvt -> StringUtils.copyTextToClipboard(lcSeq));
         }
 
@@ -1209,9 +1207,13 @@ class AlignmentTrackMenuHelper {
                     seqLength);
 
             final JMenuItem rccItem = new JMenuItem("Copy right-clipped sequence");
-            add(rccItem);
+            copyMenu.add(rccItem);
             rccItem.addActionListener(aEvt -> StringUtils.copyTextToClipboard(rcSeq));
         }
+
+        addConsensusSequence(copyMenu, te);
+
+        add(copyMenu);
     }
 
 
