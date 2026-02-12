@@ -1157,6 +1157,16 @@ class AlignmentTrackMenuHelper {
         return items;
     }
 
+    void copyFASTQToClipboard(final Alignment alignment, final int start, final int end) {
+        final String seq = alignment.getReadSequence().substring(start, end);
+        final String qual = alignment.getReadQuality().substring(start, end);
+
+        final String origSequence  = alignment.isNegativeStrand() ? SequenceUtil.reverseComplement(seq) : seq;
+        final String qualityScores = alignment.isNegativeStrand() ? new StringBuilder(qual).reverse().toString() : qual;
+
+        StringUtils.copyTextToClipboard(String.format("@%s\n%s\n+\n%s", alignment.getReadName(), origSequence, qualityScores));
+    }
+
     void addCopyMenuItem(final TrackClickEvent te, Alignment clickedAlignment) {
         JMenu copyMenu = new JMenu("Copy");
 
@@ -1180,13 +1190,7 @@ class AlignmentTrackMenuHelper {
         /* Add a "Copy as FASTQ" item to copy this single read in FASTQ format */
         final JMenuItem item2 = new JMenuItem("Copy read as FASTQ");
         copyMenu.add(item2);
-        item2.addActionListener(aEvt -> {
-            final String qual = alignment.getReadQuality();
-            final String origSequence  = alignment.isNegativeStrand() ? SequenceUtil.reverseComplement(seq) : seq;
-            final String qualityScores = alignment.isNegativeStrand() ? new StringBuilder(qual).reverse().toString() : qual;
-
-            StringUtils.copyTextToClipboard(String.format("@%s\n%s\n+\n%s", alignment.getReadName(), origSequence, qualityScores));
-        });
+        item2.addActionListener(aEvt -> copyFASTQToClipboard(alignment, 0, seq.length()));
 
         /* Add a "Copy left clipped sequence" item if there is  left clipping. */
         int minimumBlatLength = BlatClient.MINIMUM_BLAT_LENGTH;
@@ -1196,6 +1200,10 @@ class AlignmentTrackMenuHelper {
             final JMenuItem lccItem = new JMenuItem("Copy left-clipped sequence");
             copyMenu.add(lccItem);
             lccItem.addActionListener(aEvt -> StringUtils.copyTextToClipboard(lcSeq));
+
+            final JMenuItem lccfqItem = new JMenuItem("Copy left-clipped sequence as FASTQ");
+            copyMenu.add(lccfqItem);
+            lccfqItem.addActionListener(aEvt -> copyFASTQToClipboard(alignment, 0, clipping.getLeftSoft()));
         }
 
         /* Add a "Copy right clipped sequence" item if there is  right clipping. */
@@ -1209,6 +1217,10 @@ class AlignmentTrackMenuHelper {
             final JMenuItem rccItem = new JMenuItem("Copy right-clipped sequence");
             copyMenu.add(rccItem);
             rccItem.addActionListener(aEvt -> StringUtils.copyTextToClipboard(rcSeq));
+
+            final JMenuItem rccfqItem = new JMenuItem("Copy right-clipped sequence as FASTQ");
+            copyMenu.add(rccfqItem);
+            rccfqItem.addActionListener(aEvt -> copyFASTQToClipboard(alignment, seqLength - clipping.getRightSoft(), seqLength));
         }
 
         addConsensusSequence(copyMenu, te);
