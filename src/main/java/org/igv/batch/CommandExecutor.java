@@ -209,9 +209,9 @@ public class CommandExecutor {
             return Globals.VERSION;
         } else if (cmd.equals("exit")) {
             System.exit(0);
-        } else if (cmd.equals("zoomin")) {
+        } else if (cmd.equalsIgnoreCase("zoomin")) {
             FrameManager.incrementZoom(1);
-        } else if (cmd.equals("zoomout")) {
+        } else if (cmd.equalsIgnoreCase("zoomout")) {
             FrameManager.incrementZoom(-1);
         } else if ("oauth".equals(cmd) || cmd.equalsIgnoreCase("setaccesstoken")) {
             HttpUtils.getInstance().setAccessToken(param1, param2);
