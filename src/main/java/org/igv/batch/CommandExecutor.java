@@ -173,7 +173,7 @@ public class CommandExecutor {
             result = removeTrack(trackName);
         } else if (cmd.equalsIgnoreCase("addPanel")) {
             String newPanelName = param1 != null? param1 : "Panel" + System.currentTimeMillis();
-            igv.addDataPanel(newPanelName);
+            // igv.addDataPanel(newPanelName); TODO figure out what to do here
         } else if (cmd.equalsIgnoreCase("panelNames")) {
             String separator = param1 != null ? param1 : ",";
             result = igv.getTrackPanels().stream().map(t -> t.getName()).collect(Collectors.joining(separator));
